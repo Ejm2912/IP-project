@@ -1,2 +1,2 @@
-# IP-project-
+# Hang-man project 
 IP project (Millikin)
