@@ -1,2 +1,2 @@
-# Hang-man project 
+# Wheel Of Fortune Project
 IP project (Millikin)
