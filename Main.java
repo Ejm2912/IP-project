@@ -1,6 +1,3 @@
-
-
-
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.Random;
@@ -32,11 +29,44 @@ public class Main {
                                 =========  """);
     }
 
+    public static class Player {
+        private String name; // The player's name
+        private int score; // The player's score
+
+        // Constructor (a special method to create player objects)
+        public Player(String name) {
+            this.name = name;
+            this.score = 0; // Start with a score of 0
+        }
+
+        // Method to get the player's name
+        public String getName() {
+            return name;
+        }
+
+        // Method to get the player's score
+        public int getScore() {
+            return score;
+        }
+
+        // Method to add to the player's score
+        public void addScore(int amount) {
+            score += amount;
+        }
+    }
+
+    public static int spinWheel(){
+        Random random = new Random();
+        return (random.nextInt(10) + 1) * 100;
+    }
+
     public static void catsAndPhrases() {
 
         char chara;
         String line;
         Scanner in = new Scanner(System.in);
+        Player player1 = new Player("Player 1");
+        Player player2 = new Player("Player 2");
 
         System.out.println();
         System.out.println("Welcome to Wheel of Fortune! Spin the wheel and guess the phrase to win big money!");
@@ -194,18 +224,29 @@ public class Main {
 
         boolean guess = true;
         boolean[] guessedChars = new boolean[test.length()];
+        int currentPlayer = 1;
 
         while (guess) {
-            System.out.println("guess a letter!");
+
+            System.out.println("Player " + (currentPlayer == 1 ? player1.getName() : player2.getName()) + "'s turn!");
+            System.out.println(player1.getName() + " score: $" + player1.getScore());
+            System.out.println(player2.getName() + " score: $" + player2.getScore());
+
+            System.out.println("Guess a letter!");
             chara = in.nextLine().charAt(0);
 
-            if (test.contains(Character.toString(chara)))
+            if (test.contains(Character.toString(chara))) {
                 for (int i = 0; i < test.length(); i++) {
                     if (test.charAt(i) == chara) {
                         guessedChars[i] = true;
+                        if (currentPlayer == 1) {
+                            player1.addScore(spinWheel()); // Add score for player 1
+                        } else {
+                            player2.addScore(spinWheel()); // Add score for player 2
+                        }
                     }
-
                 }
+            }
 
             StringBuilder currentGuess = new StringBuilder();
             for (int i = 0; i < test.length(); i++) {
@@ -222,49 +263,44 @@ public class Main {
             if (!test.contains(Character.toString(chara))) {
                 System.out.println("Wrong guess spin again!");
             }
+
             System.out.println("Do you want to solve the phrase?(Type yes or no)");
             line = in.nextLine();
-
 
             if (Objects.equals(line, "yes")) {
                 guess = false;
                 System.out.println("You have 3 guesses if you get them wrong you lose!");
-                line = in.nextLine();
 
-                if (Objects.equals(line, test)) {
-                    System.out.print("You just won Wheel of Fortune! Congratulations!");
-                } else {
-                    System.out.println("You have 2 guesses remaining.");
-                }
-
-                line = in.nextLine();
-                if (Objects.equals(line, test)) {
-                    System.out.print("You just won Wheel of Fortune! Congratulations!");
-                } else {
-                    System.out.println("You have 1 guesses remaining.");
-
-
+                for (int i = 0; i < 3; i++) {
                     line = in.nextLine();
                     if (Objects.equals(line, test)) {
                         System.out.print("You just won Wheel of Fortune! Congratulations!");
-                        System.out.print("\n\n\n\n\n\n\n\n\n\n\n\"");
-                        closeGame();
+                        if (currentPlayer == 1) {
+                            player1.addScore(1000);
+                        } else {
+                            player2.addScore(1000);
+                        }
+                        break; // only break when the answer is correct.
                     } else {
-                        System.out.println("You lose! Too bad!");
-                        System.out.println("The correct phrase is: " + test);
-                        closeGame();
+                        if (i < 2) {
+                            System.out.println("You have " + (2 - i) + " guesses remaining.");
+                            System.out.println("Would you like a hint? (Note all preivious hints will" +
+                                    " show for extra help.)");
+                            line = in.nextLine();
+                            if (line.equalsIgnoreCase("yes")) {
+                                    System.out.println("Here is hint one : " + test.substring(0, 5));
+                                if (i == 1) {
+                                    System.out.println("Here is a hint two: " + test.substring(0, 10));
+                                }
+                            }
+
+
+
+
+                    } else {
+                            System.out.println("You lose! Too bad!");
+                            System.out.println("The correct phrase is: " + test);
+                            closeGame();
+                        }
                     }
 
-                    if (Objects.equals(line, "no")) {
-                        guess = true;
-                    }
-                }
-            }
-        }
-    }
-
-
-    public static void main(String[] args) {
-        catsAndPhrases();
-    }
-}
