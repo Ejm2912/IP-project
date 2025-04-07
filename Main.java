@@ -279,19 +279,28 @@ public class Main {
         guess = false;
         System.out.println("You have 3 guesses. If you get them wrong, you lose!");
 
-        for (int i = 0; i < 3; i++) {
-            line = in.nextLine();
-            if (Objects.equals(line, test)) {
-                System.out.print("You just won Wheel of Fortune! Congratulations!");
-                if (currentPlayer == 1) {
-                    player1.addScore(1000);
-                } else {
-                    player2.addScore(1000);
-                }
-                break;
-            } else {
-                if (i < 2) {
-                    System.out.println("You have " + (2 - i) + " guesses remaining.");
+       for (int i = 0; i < 3; i++) {
+                    line = in.nextLine();
+                    if (Objects.equals(line, test)) {
+                        System.out.print("You just won Wheel of Fortune! Congratulations!");
+                        if (currentPlayer == 1) {
+                            player1.addScore(1000);
+                        } else {
+                            player2.addScore(1000);
+                        }
+                        break; // only break when the answer is correct.
+                    } else {
+                        if (i < 2) {
+                            System.out.println("You have " + (2 - i) + " guesses remaining.");
+                            System.out.println("Would you like a hint? (Note all preivious hints will" +
+                                    " show for extra help.)");
+                            line = in.nextLine();
+                            if (line.equalsIgnoreCase("yes")) {
+                                    System.out.println("Here is hint one : " + test.substring(0, 5));
+                                if (i == 1) {
+                                    System.out.println("Here is a hint two: " + test.substring(0, 10));
+                                }
+                            }
                 } else {
                     System.out.println("You lose! Too bad!");
                     System.out.println("The correct phrase is: " + test);
