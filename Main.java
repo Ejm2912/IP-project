@@ -227,72 +227,84 @@ public class Main {
         int currentPlayer = 1;
 
         while (guess) {
+    boolean hasGuessedLetter = false; // Track if the player has guessed a letter
 
-            System.out.println("Player " + (currentPlayer == 1 ? player1.getName() : player2.getName()) + "'s turn!");
-            System.out.println(player1.getName() + " score: $" + player1.getScore());
-            System.out.println(player2.getName() + " score: $" + player2.getScore());
+    System.out.println("Player " + (currentPlayer == 1 ? player1.getName() : player2.getName()) + "'s turn!");
+    System.out.println(player1.getName() + " score: $" + player1.getScore());
+    System.out.println(player2.getName() + " score: $" + player2.getScore());
 
-            System.out.println("Guess a letter!");
-            chara = in.nextLine().charAt(0);
+    while (!hasGuessedLetter) {  // Ensure player can only guess one letter per turn
+        System.out.println("Guess a letter!");
+        chara = in.nextLine().charAt(0);
 
-            if (test.contains(Character.toString(chara))) {
-                for (int i = 0; i < test.length(); i++) {
-                    if (test.charAt(i) == chara) {
-                        guessedChars[i] = true;
-                        if (currentPlayer == 1) {
-                            player1.addScore(spinWheel()); // Add score for player 1
-                        } else {
-                            player2.addScore(spinWheel()); // Add score for player 2
-                        }
+        if (!Character.isLetter(chara)) {
+            System.out.println("Please enter a valid letter.");
+            continue;
+        }
+
+        hasGuessedLetter = true; // Set flag to true after one letter guess
+
+        if (test.contains(Character.toString(chara))) {
+            for (int i = 0; i < test.length(); i++) {
+                if (test.charAt(i) == chara) {
+                    guessedChars[i] = true;
+                    if (currentPlayer == 1) {
+                        player1.addScore(spinWheel());
+                    } else {
+                        player2.addScore(spinWheel());
                     }
                 }
             }
+        } else {
+            System.out.println("Wrong guess! Spin again.");
+        }
+    }
 
-            StringBuilder currentGuess = new StringBuilder();
-            for (int i = 0; i < test.length(); i++) {
-                if (guessedChars[i]) {
-                    currentGuess.append(test.charAt(i));
+    StringBuilder currentGuess = new StringBuilder();
+    for (int i = 0; i < test.length(); i++) {
+        if (guessedChars[i]) {
+            currentGuess.append(test.charAt(i));
+        } else {
+            currentGuess.append('_');
+        }
+    }
+
+    hiddenTest = currentGuess.toString();
+    System.out.println(hiddenTest);
+
+    System.out.println("Do you want to solve the phrase? (Type yes or no)");
+    line = in.nextLine();
+
+    if (Objects.equals(line, "yes")) {
+        guess = false;
+        System.out.println("You have 3 guesses. If you get them wrong, you lose!");
+
+        for (int i = 0; i < 3; i++) {
+            line = in.nextLine();
+            if (Objects.equals(line, test)) {
+                System.out.print("You just won Wheel of Fortune! Congratulations!");
+                if (currentPlayer == 1) {
+                    player1.addScore(1000);
                 } else {
-                    currentGuess.append('_');
+                    player2.addScore(1000);
+                }
+                break;
+            } else {
+                if (i < 2) {
+                    System.out.println("You have " + (2 - i) + " guesses remaining.");
+                } else {
+                    System.out.println("You lose! Too bad!");
+                    System.out.println("The correct phrase is: " + test);
+                    closeGame();
                 }
             }
+        }
+    }
 
-            hiddenTest = currentGuess.toString();
-            System.out.println(hiddenTest);
+    // Switch player after each turn
+    currentPlayer = (currentPlayer == 1) ? 2 : 1;
+}
 
-            if (!test.contains(Character.toString(chara))) {
-                System.out.println("Wrong guess spin again!");
-            }
-
-            System.out.println("Do you want to solve the phrase?(Type yes or no)");
-            line = in.nextLine();
-
-            if (Objects.equals(line, "yes")) {
-                guess = false;
-                System.out.println("You have 3 guesses if you get them wrong you lose!");
-
-                for (int i = 0; i < 3; i++) {
-                    line = in.nextLine();
-                    if (Objects.equals(line, test)) {
-                        System.out.print("You just won Wheel of Fortune! Congratulations!");
-                        if (currentPlayer == 1) {
-                            player1.addScore(1000);
-                        } else {
-                            player2.addScore(1000);
-                        }
-                        break; // only break when the answer is correct.
-                    } else {
-                        if (i < 2) {
-                            System.out.println("You have " + (2 - i) + " guesses remaining.");
-                            System.out.println("Would you like a hint? (Note all preivious hints will" +
-                                    " show for extra help.)");
-                            line = in.nextLine();
-                            if (line.equalsIgnoreCase("yes")) {
-                                    System.out.println("Here is hint one : " + test.substring(0, 5));
-                                if (i == 1) {
-                                    System.out.println("Here is a hint two: " + test.substring(0, 10));
-                                }
-                            }
 
 
 
