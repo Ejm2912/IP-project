@@ -41,6 +41,21 @@ public class Main {
         System.out.println();
         System.out.println("Welcome to Wheel of Fortune! Spin the wheel and guess the phrase to win big money!");
         displayAsciiArt();
+
+         // NEW: Select difficulty
+        System.out.println("\nSelect Difficulty: (easy, hard, impossible)");
+        String difficulty = in.nextLine().toLowerCase();
+        int allowedGuesses = 3; // default to hard
+        if (difficulty.equals("easy")) {
+            allowedGuesses = 5;
+        } else if (difficulty.equals("hard")) {
+            allowedGuesses = 3;
+        } else if (difficulty.equals("impossible")) {
+            allowedGuesses = 1;
+        } else {
+            System.out.println("Invalid difficulty, defaulting to hard mode.");
+        }
+        
         System.out.println("Here is your category.");
         Random random = new Random();
         int randomCat = random.nextInt(9);
