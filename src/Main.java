@@ -1,11 +1,8 @@
-
-
-
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 import java.util.Random;
+
 public class Main {
-    // Display ASCII Art at the beginning
+
     public static void displayAsciiArt() {
         System.out.println("""
                  __        ___   _ _____ _____ _        ___  _____ 
@@ -20,7 +17,6 @@ public class Main {
                 """);
     }
 
-    //Display closing message
     public static void closeGame() {
         System.out.println("""
                 ______
@@ -31,197 +27,315 @@ public class Main {
                                 |
                                 =========  """);
     }
+    public class WheelOfFortune {
+
+        static String[] wheelArt = {
+                " ___________________________",
+                "|       WHEEL OF FORTUNE    |",
+                "|---------------------------|",
+                "|  1 |   $500     🪙        |",
+                "|---------------------------|",
+                "|  2 | Lose Turn   ❌       |",
+                "|---------------------------|",
+                "|  3 | Free Spin   🔄       |",
+                "|---------------------------|",
+                "|  4 | Jackpot     💎       |",
+                "|___________________________|",
+                "             ▼               ",
+
+                "         [ SPIN! ]           "
+        };
+
+
+
+
+
+
+        public static void animateWheelSpin() {
+            for (int i = 0; i < 3; i++) {
+                clearScreen();
+                for (String line : wheelArt) {
+                    System.out.println(line);
+                }
+                System.out.println("\nSpinning" + ".".repeat(i + 1));
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        public static void clearScreen() {
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
+        }
+
+        public static String spinWheel() {
+            animateWheelSpin(); // show the ASCII art spinning
+
+            // Corrected wheel sections
+            String[] wheelSections = {"$500", "LOSE A TURN", "FREE SPIN", "JACKPOT"};
+            Random random = new Random();
+            int landedIndex = random.nextInt(wheelSections.length);
+            String result = wheelSections[landedIndex];
+
+            System.out.println("🌀 Wheel lands on: " + result);
+
+            return result; // Return the result instead of forcing an integer conversion
+        }
+
+        public static void main(String[] args) {
+            spinWheel();
+        }
+    }
+
 
     public static void catsAndPhrases() {
-
-        char chara;
-        String line;
         Scanner in = new Scanner(System.in);
 
-        System.out.println();
-        System.out.println("Welcome to Wheel of Fortune! Spin the wheel and guess the phrase to win big money!");
+        // Player setup
+        System.out.println("Enter Player 1's name:");
+        String playerOneName = in.nextLine();
+
+        System.out.println("Enter Player 2's name:");
+        String playerTwoName = in.nextLine();
+
+        Map<String, Integer> turnCount = new HashMap<>();
+        turnCount.put(playerOneName, 0);
+        turnCount.put(playerTwoName, 0);
+
+        String[] players = {playerOneName, playerTwoName};
+        Map<String, Integer> playerScores = new HashMap<>();
+        playerScores.put(playerOneName, 1000);
+        playerScores.put(playerTwoName, 1000);
+
+        // Track guessed letters
+
+        Set<Character> guessedLetters = new HashSet<>();
+
+
+        int currentPlayer = 0;
+        int currentTurnPoints = 0;
+
+        System.out.println("\nWelcome to Wheel of Fortune! Spin the wheel and guess the phrase to win big money!");
         displayAsciiArt();
 
-         // NEW: Select difficulty
-        System.out.println("\nSelect Difficulty: (easy, hard, impossible)");
-        String difficulty = in.nextLine().toLowerCase();
-        int allowedGuesses = 3; // default to hard
-        if (difficulty.equals("easy")) {
-            allowedGuesses = 5;
-        } else if (difficulty.equals("hard")) {
-            allowedGuesses = 3;
-        } else if (difficulty.equals("impossible")) {
-            allowedGuesses = 1;
-        } else {
-            System.out.println("Invalid difficulty, defaulting to hard mode.");
-        }
-        
-        System.out.println("Here is your category.");
+        // Random category and phrase selection
+        System.out.println("\nHere is your category:");
         Random random = new Random();
         int randomCat = random.nextInt(9);
         String test = " ";
 
         if (randomCat == 0) {
             System.out.println("Around The House");
-            int randomPhrase1 = random.nextInt(4);
-            if (randomPhrase1 == 0) {
-                test = "Cozy Fireplace Mantel";
-            }
-            if (randomPhrase1 == 1) {
-                test = "Stack Of Fluffy Towels";
-            }
-            if (randomPhrase1 == 2) {
-                test = "Decorative Throw Pillows";
-            }
-            if (randomPhrase1 == 3) {
-                test = "Squeaky Rocking Chair";
-            }
+            String[] phrases = {"Cozy Fireplace Mantel", "Stack Of Fluffy Towels", "Decorative Throw Pillows", "Squeaky Rocking Chair"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 1) {
             System.out.println("Food and Drink");
-            int randomPhrase2 = random.nextInt(4);
-            if (randomPhrase2 == 0) {
-                test = "Ice-Cold Lemonade";
-            }
-            if (randomPhrase2 == 1) {
-                test = "Crispy Chicken Tenders";
-            }
-            if (randomPhrase2 == 2) {
-                test = "Freshly Baked Apple Pie";
-            }
-            if (randomPhrase2 == 3) {
-                test = "Spaghetti With Meatballs";
-            }
+            String[] phrases = {"Ice-Cold Lemonade", "Crispy Chicken Tenders", "Freshly Baked Apple Pie", "Spaghetti With Meatballs"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 2) {
             System.out.println("Before and After");
-            int randomPhrase3 = random.nextInt(4);
-            if (randomPhrase3 == 0) {
-                test = "Golden Retriever Puppy Love";
-            }
-            if (randomPhrase3 == 1) {
-                test = "Apple Pie Chart";
-            }
-            if (randomPhrase3 == 2) {
-                test = "Rock Climbing Gym Membership";
-            }
-            if (randomPhrase3 == 3) {
-                test = "Chocolate Bar Exam";
-            }
+            String[] phrases = {"Golden Retriever Puppy Love", "Apple Pie Chart", "Rock Climbing Gym Membership", "Chocolate Bar Exam"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 3) {
             System.out.println("In The Kitchen");
-            int randomPhrase4 = random.nextInt(4);
-            if (randomPhrase4 == 0) {
-                test = "Stainless Steel Toaster";
-            }
-            if (randomPhrase4 == 1) {
-                test = "Nonstick Frying Pan";
-            }
-            if (randomPhrase4 == 2) {
-                test = "Measuring Cups And Spoons";
-            }
-            if (randomPhrase4 == 3) {
-                test = "Spice Rack Organizer";
-            }
+            String[] phrases = {"Stainless Steel Toaster", "Nonstick Frying Pan", "Measuring Cups And Spoons", "Spice Rack Organizer"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 4) {
             System.out.println("Best Seller(s)");
-            int randomPhrase5 = random.nextInt(4);
-            if (randomPhrase5 == 0) {
-                test = "The Great Gatsby";
-            }
-            if (randomPhrase5 == 1) {
-                test = "New York Times Bestseller List";
-            }
-            if (randomPhrase5 == 2) {
-                test = "To Kill A Mockingbird";
-            }
-            if (randomPhrase5 == 3) {
-                test = "The Catcher In The Rye";
-            }
+            String[] phrases = {"The Great Gatsby", "New York Times Bestseller List", "To Kill A Mockingbird", "The Catcher In The Rye"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 5) {
             System.out.println("Character(s)");
-            int randomPhrase6 = random.nextInt(4);
-            if (randomPhrase6 == 0) {
-                test = "The Three Musketeers";
-            }
-            if (randomPhrase6 == 1) {
-                test = "Sherlock Holmes And Dr. Watson";
-            }
-            if (randomPhrase6 == 2) {
-                test = "Romeo And Juliet";
-            }
-            if (randomPhrase6 == 3) {
-                test = "The Hardy Boys";
-            }
+            String[] phrases = {"The Three Musketeers", "Sherlock Holmes And Dr. Watson", "Romeo And Juliet", "The Hardy Boys"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 6) {
             System.out.println("Fictional Character(s)");
-            int randomPhrase7 = random.nextInt(4);
-            if (randomPhrase7 == 0) {
-                test = "Harry Potter And The Sorcerer’s Stone";
-            }
-            if (randomPhrase7 == 1) {
-                test = "Winnie The Pooh";
-            }
-            if (randomPhrase7 == 2) {
-                test = "SpongeBob SquarePants";
-            }
-            if (randomPhrase7 == 3) {
-                test = "Katniss Everdeen";
-            }
+            String[] phrases = {"Harry Potter And The Sorcerer’s Stone", "Winnie The Pooh", "SpongeBob SquarePants", "Katniss Everdeen"};
+            test = phrases[random.nextInt(phrases.length)];
         } else if (randomCat == 7) {
             System.out.println("Event(s)");
-            int randomPhrase8 = random.nextInt(4);
-            if (randomPhrase8 == 0) {
-                test = "High School Graduation";
-            }
-            if (randomPhrase8 == 1) {
-                test = "Surprise Birthday Party";
-            }
-            if (randomPhrase8 == 2) {
-                test = "Thanksgiving Day Parade";
-            }
-            if (randomPhrase8 == 3) {
-                test = "New Year's Eve Celebration";
-            }
+            String[] phrases = {"High School Graduation", "Surprise Birthday Party", "Thanksgiving Day Parade", "New Year's Eve Celebration"};
+            test = phrases[random.nextInt(phrases.length)];
         } else {
             System.out.println("Movie Quotes");
-            int randomPhrase9 = random.nextInt(4);
-            if (randomPhrase9 == 0) {
-                test = "May the Force be with you.  Star Wars";
-            }
-            if (randomPhrase9 == 1) {
-                test = "I'll be back.  The Terminator";
-            }
-            if (randomPhrase9 == 2) {
-                test = "You can't handle the truth!   A Few Good Men ";
-            }
-            if (randomPhrase9 == 3) {
-                test = "There's no place like home.  The Wizard of Oz";
-            }
+            String[] phrases = {"May the Force be with you.  Star Wars", "I'll be back.  The Terminator", "You can't handle the truth!   A Few Good Men", "There's no place like home.  The Wizard of Oz"};
+            test = phrases[random.nextInt(phrases.length)];
         }
-        System.out.println("Here is your phrase");
 
+        String hiddenTest = test.replaceAll("[a-zA-Z]", "_");
+        boolean[] guessedChars = new boolean[test.length()];
+        boolean guess = true;
 
-        String hiddenTest = test.replaceAll("[a-zA-z]", "_");
+        System.out.println("\nHere is your phrase:");
         System.out.println(hiddenTest);
 
-        System.out.println();
-        System.out.println("Guess the Phrase!");
-
-
-        boolean guess = true;
-        boolean[] guessedChars = new boolean[test.length()];
-
         while (guess) {
-            System.out.println("guess a letter!");
-            chara = in.nextLine().charAt(0);
+            String currentPlayerName = players[currentPlayer];
+            currentTurnPoints = 0; // Reset per turn points
+            turnCount.put(currentPlayerName, turnCount.get(currentPlayerName) + 1);
 
-            if (test.contains(Character.toString(chara)))
-                for (int i = 0; i < test.length(); i++) {
-                    if (test.charAt(i) == chara) {
-                        guessedChars[i] = true;
+            System.out.println("\n" + currentPlayerName + "'s turn!");
+            System.out.println(playerOneName + " score: $" + playerScores.get(playerOneName));
+            System.out.println(playerTwoName + " score: $" + playerScores.get(playerTwoName));
+            System.out.println("Choose an action:");
+            System.out.println("1. Spin and guess a consonant");
+            System.out.println("2. Buy a vowel ($250)");
+            System.out.println("3. Solve the puzzle");
+            System.out.println("4. Give up");
+
+            String choice = in.nextLine();
+
+            switch (choice) {
+                case "1":
+                    // Spin the wheel and get the result as a String
+                    String spinResult = WheelOfFortune.spinWheel();
+
+                    // Default spinAmount
+                    int spinAmount = 0;
+
+                    // Determine points or action based on spin result
+                    if (spinResult.startsWith("$")) {
+                        spinAmount = Integer.parseInt(spinResult.replace("$", ""));
+                    } else if (spinResult.equals("JACKPOT")) {
+                        spinAmount = 1000;
+                        System.out.println("💎 JACKPOT! You win 1000 points!");
+                    } else if (spinResult.equals("FREE SPIN")) {
+                        System.out.println("🔄 FREE SPIN! You get another turn!");
+
+                    } else if (spinResult.equals("LOSE A TURN")) {
+                        System.out.println("❌ LOSE A TURN!");
+                        currentPlayer = (currentPlayer + 1) % 2;
+                        continue;
                     }
 
-                }
+                    System.out.println("Wheel spun: " + spinResult);
+                    System.out.println("Letters guessed so far: " + guessedLetters);
+                    System.out.println("Guess a consonant:");
 
+                    String consonantInput = in.nextLine();
+                    if (consonantInput.length() != 1 || !Character.isLetter(consonantInput.charAt(0))) {
+                        System.out.println("❌ Please enter a single letter.");
+                        break;
+                    }
+
+                    char guessedChar = Character.toLowerCase(consonantInput.charAt(0));
+                    if ("aeiou".indexOf(guessedChar) != -1) {
+                        System.out.println("That's a vowel — use option 2 to buy one.");
+                        break;
+                    }
+
+                    if (guessedLetters.contains(guessedChar)) {
+                        System.out.println("❌ You already guessed that letter!");
+                        break;
+                    }
+
+                    guessedLetters.add(guessedChar);
+                    boolean found = false;
+
+                    for (int i = 0; i < test.length(); i++) {
+                        if (Character.toLowerCase(test.charAt(i)) == guessedChar) {
+                            guessedChars[i] = true;
+                            found = true;
+                        }
+                    }
+
+                    if (found) {
+                        playerScores.put(currentPlayerName, playerScores.get(currentPlayerName) + spinAmount);
+                        System.out.println("✅ Correct! You earned $" + spinAmount);
+                    } else {
+                        System.out.println("❌ Incorrect guess.");
+                    }
+
+                    break;
+
+
+                case "2":
+                    // Handle buying a vowel
+                    System.out.println("Enter a vowel to buy (a, e, i, o, u):");
+                    String vowelInput = in.nextLine();
+                    if (vowelInput.length() != 1 || !"aeiou".contains(vowelInput.toLowerCase())) {
+                        System.out.println("❌ Invalid vowel.");
+                        break;
+                    }
+
+                    char vowelChar = vowelInput.toLowerCase().charAt(0);
+                    if (guessedLetters.contains(vowelChar)) {
+                        System.out.println("❌ You already guessed that letter!");
+                        break;
+                    }
+
+                    if (playerScores.get(currentPlayerName) < 250) {
+                        System.out.println("Not enough money to buy a vowel.");
+                        break;
+                    }
+
+                    guessedLetters.add(vowelChar);
+                    playerScores.put(currentPlayerName, playerScores.get(currentPlayerName) - 250);
+                    boolean foundVowel = false;
+
+                    for (int i = 0; i < test.length(); i++) {
+                        if (Character.toLowerCase(test.charAt(i)) == vowelChar) {
+                            guessedChars[i] = true;
+                            foundVowel = true;
+                        }
+                    }
+
+                    if (foundVowel) {
+                        System.out.println("✅ Correct vowel!");
+                    } else {
+                        System.out.println("❌ No match.");
+                    }
+                    break;
+
+                case "3":
+                    // Handle solving the puzzle
+                    System.out.println("Enter your solution (you get up to 3 tries):");
+                    boolean solved = false;
+
+                    for (int i = 0; i < 3; i++) {
+                        String attempt = in.nextLine();
+                        if (attempt.toLowerCase().equals(test.toLowerCase())) {
+                            System.out.println("🎉 Correct! You solved it!");
+                            int currentScore = playerScores.getOrDefault(currentPlayerName, 0);
+                            playerScores.put(currentPlayerName, currentScore + 1000);
+                            solved = true;
+                            guess = false; // Signal the end of the current guessing round
+                            break;
+                        } else {
+                            if (i < 2) {
+                                System.out.println("❌ Wrong! You have " + (2 - i) + " guesses left.");
+                            } else {
+                                System.out.println("❌ Failed to solve. Turn passes.");
+                            }
+                        }
+                    }
+
+                    if (!solved && guess) {
+                        currentPlayer = (currentPlayer + 1) % 2;
+                    }
+
+                    break;
+
+                case "4":
+                    System.out.println(currentPlayerName + " gave up. Game over.");
+                    System.out.println("The correct phrase was: \"" + test + "\"");
+                    closeGame();
+                    guess = false;
+                    System.out.println("\n🏆 Final Scores:");
+                    System.out.println(playerOneName + ": $" + playerScores.get(playerOneName));
+                    System.out.println(playerTwoName + ": $" + playerScores.get(playerTwoName));
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+                    continue;
+            }
+
+            // Update phrase
             StringBuilder currentGuess = new StringBuilder();
             for (int i = 0; i < test.length(); i++) {
                 if (guessedChars[i]) {
@@ -234,50 +348,59 @@ public class Main {
             hiddenTest = currentGuess.toString();
             System.out.println(hiddenTest);
 
-            if (!test.contains(Character.toString(chara))) {
-                System.out.println("Wrong guess spin again!");
-            }
-            System.out.println("Do you want to solve the phrase?(Type yes or no)");
-            line = in.nextLine();
+            System.out.println("Do you want to solve the phrase? (yes/no)");
+            String solve = in.nextLine();
 
+            if (solve.toLowerCase().equals("yes")) {
+                System.out.println("Enter your solution:");
+                boolean solved = false;
 
-            if (Objects.equals(line, "yes")) {
-                guess = false;
-                System.out.println("You have 3 guesses if you get them wrong you lose!");
-                line = in.nextLine();
-
-                if (Objects.equals(line, test)) {
-                    System.out.print("You just won Wheel of Fortune! Congratulations!");
-                } else {
-                    System.out.println("You have 2 guesses remaining.");
-                }
-
-                line = in.nextLine();
-                if (Objects.equals(line, test)) {
-                    System.out.print("You just won Wheel of Fortune! Congratulations!");
-                } else {
-                    System.out.println("You have 1 guesses remaining.");
-
-
-                    line = in.nextLine();
-                    if (Objects.equals(line, test)) {
-                        System.out.print("You just won Wheel of Fortune! Congratulations!");
-                        System.out.print("\n\n\n\n\n\n\n\n\n\n\n\"");
-                        closeGame();
+                for (int i = 0; i < 3; i++) {
+                    String attempt = in.nextLine();
+                    if (attempt.toLowerCase().equals(test.toLowerCase())) {
+                        System.out.println("🎉 Correct! You solved it!");
+                        int currentScore = playerScores.getOrDefault(currentPlayerName, 0);
+                        playerScores.put(currentPlayerName, currentScore + currentTurnPoints + 1000);
+                        solved = true;
+                        guess = false;
+                        break;
                     } else {
-                        System.out.println("You lose! Too bad!");
-                        System.out.println("The correct phrase is: " + test);
-                        closeGame();
-                    }
-
-                    if (Objects.equals(line, "no")) {
-                        guess = true;
+                        if (i < 2) {
+                            System.out.println("❌ Wrong! You have " + (2 - i) + " guesses left.");
+                        } else {
+                            System.out.println("❌ Failed to solve. Turn passes.");
+                        }
                     }
                 }
-            }
-        }
-    }
 
+                if (!solved && guess) {
+                    currentPlayer = (currentPlayer + 1) % 2; // Switch player after failed solve
+                }
+            } else {
+                // Switch turn if player chooses not to solve
+                currentPlayer = (currentPlayer + 1) % 2;
+            }
+            // Check if a player has run out of money
+            if (playerScores.get(currentPlayerName) <= 0) {
+                System.out.println(currentPlayerName + " has run out of money! Game over.");
+                closeGame();
+                break;
+            }
+
+            // Check if both players have used 10 turns
+            if (turnCount.get(playerOneName) >= 10 && turnCount.get(playerTwoName) >= 10) {
+                System.out.println("Both players reached 10 turns. Game over!");
+                closeGame();
+                break;
+            }
+
+        }
+
+        // Show final scores
+        System.out.println("\n🏆 Final Scores:");
+        System.out.println(playerOneName + ": $" + playerScores.get(playerOneName));
+        System.out.println(playerTwoName + ": $" + playerScores.get(playerTwoName));
+    }
 
     public static void main(String[] args) {
         catsAndPhrases();
