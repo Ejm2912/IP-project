@@ -123,48 +123,46 @@ public class Main {
         displayAsciiArt();
 
         // Random category and phrase selection
+        //TODO: This could be an array of lists
         System.out.println("\nHere is your category:");
         Random random = new Random();
-        int randomCat = random.nextInt(9);
-        String test = " ";
+        Map<Integer, List<String>> categoryPhrases = new HashMap<>();
+        Map<Integer, String> categoryNames = new HashMap<>();
 
-        if (randomCat == 0) {
-            System.out.println("Around The House");
-            String[] phrases = {"Cozy Fireplace Mantel", "Stack Of Fluffy Towels", "Decorative Throw Pillows", "Squeaky Rocking Chair"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 1) {
-            System.out.println("Food and Drink");
-            String[] phrases = {"Ice-Cold Lemonade", "Crispy Chicken Tenders", "Freshly Baked Apple Pie", "Spaghetti With Meatballs"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 2) {
-            System.out.println("Before and After");
-            String[] phrases = {"Golden Retriever Puppy Love", "Apple Pie Chart", "Rock Climbing Gym Membership", "Chocolate Bar Exam"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 3) {
-            System.out.println("In The Kitchen");
-            String[] phrases = {"Stainless Steel Toaster", "Nonstick Frying Pan", "Measuring Cups And Spoons", "Spice Rack Organizer"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 4) {
-            System.out.println("Best Seller(s)");
-            String[] phrases = {"The Great Gatsby", "New York Times Bestseller List", "To Kill A Mockingbird", "The Catcher In The Rye"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 5) {
-            System.out.println("Character(s)");
-            String[] phrases = {"The Three Musketeers", "Sherlock Holmes And Dr. Watson", "Romeo And Juliet", "The Hardy Boys"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 6) {
-            System.out.println("Fictional Character(s)");
-            String[] phrases = {"Harry Potter And The Sorcerer’s Stone", "Winnie The Pooh", "SpongeBob SquarePants", "Katniss Everdeen"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else if (randomCat == 7) {
-            System.out.println("Event(s)");
-            String[] phrases = {"High School Graduation", "Surprise Birthday Party", "Thanksgiving Day Parade", "New Year's Eve Celebration"};
-            test = phrases[random.nextInt(phrases.length)];
-        } else {
-            System.out.println("Movie Quotes");
-            String[] phrases = {"May the Force be with you.  Star Wars", "I'll be back.  The Terminator", "You can't handle the truth!   A Few Good Men", "There's no place like home.  The Wizard of Oz"};
-            test = phrases[random.nextInt(phrases.length)];
-        }
+        categoryNames.put(0, "Around The House");
+        categoryPhrases.put(0, Arrays.asList("Cozy Fireplace Mantel", "Stack Of Fluffy Towels", "Decorative Throw Pillows", "Squeaky Rocking Chair"));
+
+        categoryNames.put(1, "Food and Drink");
+        categoryPhrases.put(1, Arrays.asList("Ice-Cold Lemonade", "Crispy Chicken Tenders", "Freshly Baked Apple Pie", "Spaghetti With Meatballs"));
+
+        categoryNames.put(2, "Before and After");
+        categoryPhrases.put(2, Arrays.asList("Golden Retriever Puppy Love", "Apple Pie Chart", "Rock Climbing Gym Membership", "Chocolate Bar Exam"));
+
+        categoryNames.put(3, "In The Kitchen");
+        categoryPhrases.put(3, Arrays.asList("Stainless Steel Toaster", "Nonstick Frying Pan", "Measuring Cups And Spoons", "Spice Rack Organizer"));
+
+        categoryNames.put(4, "Best Seller(s)");
+        categoryPhrases.put(4, Arrays.asList("The Great Gatsby", "New York Times Bestseller List", "To Kill A Mockingbird", "The Catcher In The Rye"));
+
+        categoryNames.put(5, "Character(s)");
+        categoryPhrases.put(5, Arrays.asList("The Three Musketeers", "Sherlock Holmes And Dr. Watson", "Romeo And Juliet", "The Hardy Boys"));
+
+        categoryNames.put(6, "Fictional Character(s)");
+        categoryPhrases.put(6, Arrays.asList("Harry Potter And The Sorcerer’s Stone", "Winnie The Pooh", "SpongeBob SquarePants", "Katniss Everdeen"));
+
+        categoryNames.put(7, "Event(s)");
+        categoryPhrases.put(7, Arrays.asList("High School Graduation", "Surprise Birthday Party", "Thanksgiving Day Parade", "New Year's Eve Celebration"));
+
+        categoryNames.put(8, "Movie Quotes");
+        categoryPhrases.put(8, Arrays.asList("May the Force be with you.  Star Wars", "I'll be back.  The Terminator", "You can't handle the truth!   A Few Good Men", "There's no place like home.  The Wizard of Oz"));
+
+// Pick a random category and phrase
+        int randomCat = random.nextInt(categoryPhrases.size());
+        System.out.println(categoryNames.get(randomCat));
+
+        List<String> phrases = categoryPhrases.get(randomCat);
+        String test = phrases.get(random.nextInt(phrases.size()));
+
 
         String hiddenTest = test.replaceAll("[a-zA-Z]", "_");
         boolean[] guessedChars = new boolean[test.length()];
