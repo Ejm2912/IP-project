@@ -1,0 +1,665 @@
+import java.util.Random;
+import java.util.Map;
+import java.util.Set;
+import java.util.Scanner;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.List;
+
+
+public class Main {
+
+    public static void displayAsciiArt() {
+        System.out.println("""
+                 __        ___   _ _____ _____ _        ___  _____ 
+                \\ \\      / / | | | ____| ____| |      / _ \\|  ___|
+                 \\ \\ /\\ / /| |_| |  _| |  _| | |     | | | | |_   
+                  \\ V  V / |  _  | |___| |___| |___  | |_| |  _|  
+                 __\\_/\\_/_ |_|_|_|_____|_____|_____|__\\___/|_|    
+                |  ___/ _ \\|  _ \\_   _| | | | \\ | | ____|         
+                | |_ | | | | |_) || | | | | |  \\| |  _|           
+                |  _|| |_| |  _ < | | | |_| | |\\  | |___          
+                |_|   \\___/|_| \\_\\|_|  \\___/|_| \\_|_____|         
+                """);
+    }
+
+    public static void closeGame() {
+        System.out.println("""
+                ______
+                                |      |
+                                |      O
+                                |     /|\\\\
+                                |     / \\\\
+                                |
+                                =========  """);
+    }
+    public class WheelOfFortune {
+
+        static String[] wheelArt = {
+                " ___________________________",
+                "|       WHEEL OF FORTUNE    |",
+                "|---------------------------|",
+                "|  1 |   $500     🪙        |",
+                "|---------------------------|",
+                "|  2 | Lose Turn   ❌       |",
+                "|---------------------------|",
+                "|  3 | Free Spin   🔄       |",
+                "|---------------------------|",
+                "|  4 | Jackpot     💎       |",
+                "|___________________________|",
+                "             ▼               ",
+
+                "         [ SPIN! ]           "
+        };
+
+        // TODO LIST - WheelOfFortune Methods
+        //  Improve spin animation
+        //  find suitable ascii art
+
+
+        /**
+         * Simulates the spinning animation of the Wheel of Fortune using ASCII art.
+         * This includes clearing the screen and printing a spinning message.
+         * Runs the animation loop 3 times with a short delay for each.
+         */
+
+        public static void animateWheelSpin() {
+            for (int i = 0; i < 3; i++) {
+                clearScreen();
+                for (String line : wheelArt) {
+                    System.out.println(line);// Print ASCII wheel
+                }
+                System.out.println("\nSpinning" + ".".repeat(i + 1)); // Add spinning effect
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        /**
+         * Simulates clearing the console screen by printing 50 new lines.
+         */
+
+        public static void clearScreen() {
+            for (int i = 0; i < 50; i++) {
+                System.out.println();// Prints empty lines to simulate a cleared screen
+            }
+        }
+
+        /**
+         * Spins the wheel by showing the animation and randomly selecting a section.
+         * Returns one of the predefined outcomes such as "$500", "LOSE A TURN", "FREE SPIN", "JACKPOT".
+         *
+         * @return The result of the wheel spin as a string.
+         */
+
+        public static String spinWheel() {
+            animateWheelSpin(); // show the ASCII art spinning
+
+            // Corrected wheel sections
+            String[] wheelSections = {"$500", "LOSE A TURN", "FREE SPIN", "JACKPOT"};
+            Random random = new Random();
+            int landedIndex = random.nextInt(wheelSections.length);// Random index
+            String result = wheelSections[landedIndex];// Select the outcome
+
+            System.out.println("🌀 Wheel lands on: " + result); // Announce result
+
+            return result; // Return the result instead of forcing an integer conversion
+        }
+
+        /**
+         * Test runner for spinWheel. Meant for standalone testing.
+         */
+
+        public static void main(String[] args) {
+            spinWheel();  // Run a single wheel spin to test output
+        }
+    }
+    // TODO LIST - saveGame()
+    //  Saves player names and scores
+    //  Saves original and masked phrase
+    //  Stores guessed letters as CSV
+    //  Records current player and category
+
+
+
+
+    /**
+     * Saves the current game state to a file named "wheel_of_fortune_save.txt".
+     * It stores player names, scores, the original and hidden phrase, guessed letters,
+     * current turn, and category in plain text format. This allows the game to be resumed later.
+     *
+     * @param playerOneName Name of player one
+     * @param playerTwoName Name of player two
+     * @param playerScores  Map containing each player's current score
+     * @param test          The original full phrase to be guessed
+     * @param hiddenTest    The masked version of the phrase (with underscores)
+     * @param guessedLetters Set of all letters guessed so far
+     * @param currentPlayer Index of the current player (0 or 1)
+     * @param category      The category of the phrase
+     */
+    public static void saveGame(String playerOneName, String playerTwoName, Map<String, Integer> playerScores, String test, String hiddenTest, Set<Character> guessedLetters, int currentPlayer, String category) {
+        // Creates (if it does not exist) and assigns the filename used to store game data.
+        String filename = "wheel_of_fortune_save.txt";
+        try (FileWriter writer = new FileWriter(filename)) {
+            // Save player names and scores
+            writer.write("Player1Name:" + playerOneName + "\n");
+            writer.write("Player2Name:" + playerTwoName + "\n");
+            writer.write("Player1Score:" + playerScores.get(playerOneName) + "\n");
+            writer.write("Player2Score:" + playerScores.get(playerTwoName) + "\n");
+            // Save game content
+            writer.write("OriginalPhrase:" + test + "\n");// Full phrase
+            writer.write("HiddenPhrase:" + hiddenTest + "\n"); // Masked phrase
+            writer.write("Category:" + category + "\n"); // Category for display
+
+            // Save guessed letters (separated by commas)
+            StringBuilder guessedLettersStr = new StringBuilder();
+            for (Character letter : guessedLetters) {
+                guessedLettersStr.append(letter).append(",");
+            }
+            if (guessedLettersStr.length() > 0) {
+                guessedLettersStr.deleteCharAt(guessedLettersStr.length() - 1); // Remove the trailing comma
+            }
+            writer.write("GuessedLetters:" + guessedLettersStr.toString() + "\n");
+            // Save current player's turn index
+            writer.write("CurrentPlayer:" + currentPlayer + "\n");
+
+            System.out.println("Game data saved to " + filename);
+
+        } catch (IOException e) {
+            System.err.println("Error saving game: " + e.getMessage());
+        }
+    }
+    //TODO LIST - loadGame()
+    // Reads all essential game data from the save file
+    // Parses and stores player names, scores, phrase, guessed letters, and turn
+    // Reconstructs guessedLetters set from saved CSV
+    // Restores game category for display
+
+    /**
+     * Loads the previously saved game state from a file named "wheel_of_fortune_save.txt".
+     * Reads and reconstructs game variables including player data, the phrase, guessed letters,
+     * turn information, and category. Returns all data in a structured Object array.
+     *
+     * @return Object[] containing all reconstructed game elements:
+     *         [0] - Player 1 name (String)
+     *         [1] - Player 2 name (String)
+     *         [2] - Player scores (Map<String, Integer>)
+     *         [3] - Full phrase to guess (String)
+     *         [4] - Hidden (masked) phrase (String)
+     *         [5] - Guessed letters set (Set<Character>)
+     *         [6] - Current player's index (int)
+     *         [7] - Category of the phrase (String)
+     */
+
+
+    public static Object[] loadGame() {
+        // The file name used for loading game state
+        String filename = "wheel_of_fortune_save.txt";
+        File saveFile = new File(filename);
+        // Initialize variables to hold the loaded game data
+        String category = "";
+        String playerOneName = "";
+        String playerTwoName = "";
+        Map<String, Integer> playerScores = new HashMap<>();
+        String test = "";         // full original phrase
+        String hiddenTest = "";   // masked version (underscores)
+        Set<Character> guessedLetters = new HashSet<>();
+        int currentPlayer = 0;
+
+        try {
+            Scanner reader = new Scanner(saveFile);
+            // Read the file line-by-line and assign values based on the label
+            while (reader.hasNextLine()) {
+                String line = reader.nextLine();
+
+                if (line.startsWith("Player1Name:")) {
+                    playerOneName = line.substring("Player1Name:".length());
+                } else if (line.startsWith("Player2Name:")) {
+                    playerTwoName = line.substring("Player2Name:".length());
+                } else if (line.startsWith("Player1Score:")) {
+                    playerScores.put(playerOneName, Integer.parseInt(line.substring("Player1Score:".length())));
+                } else if (line.startsWith("Player2Score:")) {
+                    playerScores.put(playerTwoName, Integer.parseInt(line.substring("Player2Score:".length())));
+                } else if (line.startsWith("OriginalPhrase:")) {
+                    test = line.substring("OriginalPhrase:".length());
+                } else if (line.startsWith("HiddenPhrase:")) {
+                    hiddenTest = line.substring("HiddenPhrase:".length());
+                } else if (line.startsWith("GuessedLetters:")) {
+                    // Rebuild the set of guessed letters from CSV format
+                    String lettersStr = line.substring("GuessedLetters:".length());
+                    if (!lettersStr.isEmpty()) {
+                        for (String s : lettersStr.split(",")) {
+                            guessedLetters.add(s.charAt(0));
+                        }
+                    }
+                } else if (line.startsWith("CurrentPlayer:")) {
+                    currentPlayer = Integer.parseInt(line.substring("CurrentPlayer:".length()));
+
+                } else if (line.startsWith("Category:")) {
+                    category = line.substring("Category:".length());
+                }
+            }
+            reader.close();
+
+            // Return all reconstructed game elements
+            return new Object[]{playerOneName, playerTwoName, playerScores, test, hiddenTest, guessedLetters, currentPlayer, category};
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Save file not found: " + e.getMessage());
+            return null;
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing save data: " + e.getMessage());
+            return null;
+        } catch (StringIndexOutOfBoundsException e) {
+            System.err.println("Error in save file format: " + e.getMessage());
+            return null;
+        }
+    }
+    //TODO LIST - catsAndPhrases()
+    // Sets up players, scores, turns, and free spin tracking
+    // Randomly selects a category and phrase
+    // Displays masked phrase and updates on correct guesses
+    // Allows consonant guesses, vowel purchases, and solving attempts
+    // Tracks guessed letters and switching turns
+    // Supports saving and loading game state(including category)
+    // Handles free spin logic on 'LOSE A TURN'
+    // Ends game after 10 turns each or if a player goes bankrupt
+    // Uses HashMaps to organize categories and their associated phrases
+
+    /**
+     * Main game loop for Wheel of Fortune.
+     *
+     * Initializes player names and scores, selects a phrase and category from
+     * predefined HashMaps, and runs the core game logic including:
+     * - spinning the wheel,
+     * - buying vowels,
+     * - solving the puzzle,
+     * - saving and loading game state.
+     *
+     * Includes features such as free spins, turn tracking, scoring,
+     * and early termination if a player goes bankrupt or 10 turns are completed.
+     */
+
+
+    public static void catsAndPhrases() {
+        Scanner in = new Scanner(System.in);
+
+        //Setup players, scores, turn counters, and tracking maps
+        System.out.println("Enter Player 1's name:");
+        String playerOneName = in.nextLine();
+
+        System.out.println("Enter Player 2's name:");
+        String playerTwoName = in.nextLine();
+
+        Map<String, Integer> turnCount = new HashMap<>();
+        turnCount.put(playerOneName, 0);
+        turnCount.put(playerTwoName, 0);
+
+        String[] players = {playerOneName, playerTwoName};
+        Map<String, Integer> playerScores = new HashMap<>();
+        playerScores.put(playerOneName, 1000);
+        playerScores.put(playerTwoName, 1000);
+
+        //tracks the number of "Free Spins" each player has earned.
+        //If a player lands on "Lose a Turn" but has a Free Spin, they can use it to keep their turn.
+        Map<String, Integer> freeSpins = new HashMap<>();
+        freeSpins.put(playerOneName, 0);
+        freeSpins.put(playerTwoName, 0);
+
+        // Track guessed letters
+
+        Set<Character> guessedLetters = new HashSet<>();
+        int currentPlayer = 0;
+        int currentTurnPoints = 0;
+        //Display game introduction and ASCII art
+        System.out.println("\nWelcome to Wheel of Fortune! Spin the wheel and guess the phrase to win big money!");
+        displayAsciiArt();
+
+       // categoryNames maps integer keys to category labels
+       // categoryPhrases maps those same keys to a list of phrases associated with each category
+       // This structure replaces a long switch-case and makes the game easier to maintain or extend
+
+        // Random category and phrase selection
+        String category = ""; // Holds the current category for use across the game(save/load)
+        System.out.println("\nHere is your category:");
+        Random random = new Random();
+        Map<Integer, List<String>> categoryPhrases = new HashMap<>();
+        Map<Integer, String> categoryNames = new HashMap<>();
+
+        categoryNames.put(0, "Around The House");
+        categoryPhrases.put(0, Arrays.asList("Cozy Fireplace Mantel", "Stack Of Fluffy Towels", "Decorative Throw Pillows", "Squeaky Rocking Chair"));
+
+        categoryNames.put(1, "Food and Drink");
+        categoryPhrases.put(1, Arrays.asList("Ice-Cold Lemonade", "Crispy Chicken Tenders", "Freshly Baked Apple Pie", "Spaghetti With Meatballs"));
+
+        categoryNames.put(2, "Before and After");
+        categoryPhrases.put(2, Arrays.asList("Golden Retriever Puppy Love", "Apple Pie Chart", "Rock Climbing Gym Membership", "Chocolate Bar Exam"));
+
+        categoryNames.put(3, "In The Kitchen");
+        categoryPhrases.put(3, Arrays.asList("Stainless Steel Toaster", "Nonstick Frying Pan", "Measuring Cups And Spoons", "Spice Rack Organizer"));
+
+        categoryNames.put(4, "Best Seller(s)");
+        categoryPhrases.put(4, Arrays.asList("The Great Gatsby", "New York Times Bestseller List", "To Kill A Mockingbird", "The Catcher In The Rye"));
+
+        categoryNames.put(5, "Character(s)");
+        categoryPhrases.put(5, Arrays.asList("The Three Musketeers", "Sherlock Holmes And Dr. Watson", "Romeo And Juliet", "The Hardy Boys"));
+
+        categoryNames.put(6, "Fictional Character(s)");
+        categoryPhrases.put(6, Arrays.asList("Harry Potter And The Sorcerer’s Stone", "Winnie The Pooh", "SpongeBob SquarePants", "Katniss Everdeen"));
+
+        categoryNames.put(7, "Event(s)");
+        categoryPhrases.put(7, Arrays.asList("High School Graduation", "Surprise Birthday Party", "Thanksgiving Day Parade", "New Year's Eve Celebration"));
+
+        categoryNames.put(8, "Movie Quotes");
+        categoryPhrases.put(8, Arrays.asList("May the Force be with you.  Star Wars", "I'll be back.  The Terminator", "You can't handle the truth!   A Few Good Men", "There's no place like home.  The Wizard of Oz"));
+
+     // Pick a random category and phrase
+        int randomCat = random.nextInt(categoryPhrases.size());
+        category = categoryNames.get(randomCat); //Assign the selected category
+        System.out.println(category);// Print the category
+
+        List<String> phrases = categoryPhrases.get(randomCat);
+        String test = phrases.get(random.nextInt(phrases.size()));
+
+
+        String hiddenTest = test.replaceAll("[a-zA-Z]", "_");
+        boolean[] guessedChars = new boolean[test.length()];
+        boolean guess = true;
+
+        System.out.println("\nHere is your phrase:");
+        System.out.println(hiddenTest);
+
+
+
+
+        //Start main game loop
+        while (guess) {
+            String currentPlayerName = players[currentPlayer];
+            currentTurnPoints = 0; // Reset per turn points
+            turnCount.put(currentPlayerName, turnCount.get(currentPlayerName) + 1);
+
+            // In game selection menu
+            System.out.println("\n" + currentPlayerName + "'s turn!");
+            System.out.println(playerOneName + " score: $" + playerScores.get(playerOneName));
+            System.out.println(playerTwoName + " score: $" + playerScores.get(playerTwoName));
+            System.out.println("Choose an action:");
+            System.out.println("1. Spin and guess a consonant");
+            System.out.println("2. Buy a vowel ($250)");
+            System.out.println("3. Solve the puzzle");
+            System.out.println("4. Give up");
+            System.out.println("5. Save game");
+            System.out.println("6. Load game");
+
+            String choice = in.nextLine();
+
+            switch (choice) {
+                case "1":
+                    // Player chose to spin the wheel and guess a consonant
+                    String spinResult = WheelOfFortune.spinWheel();
+
+                    // Default spinAmount
+                    int spinAmount = 0;
+
+                    // Determine points or action based on spin result
+                    if (spinResult.startsWith("$")) {
+                        spinAmount = Integer.parseInt(spinResult.replace("$", ""));
+                    } else if (spinResult.equals("JACKPOT")) {
+                        spinAmount = 1000;
+                        System.out.println("💎 JACKPOT! You win 1000 points!");
+                    } else if (spinResult.equals("FREE SPIN")) {
+                        System.out.println("🔄 FREE SPIN! You get another turn!");
+                        freeSpins.put(currentPlayerName, freeSpins.get(currentPlayerName) + 1);
+
+                    } else if (spinResult.equals("LOSE A TURN")) {
+                        if (freeSpins.get(currentPlayerName) > 0) {
+                            System.out.println("🔄 You have a Free Spin! Using it to keep your turn.");
+                            freeSpins.put(currentPlayerName, freeSpins.get(currentPlayerName) - 1);
+                        } else {
+                            System.out.println("❌ LOSE A TURN!");
+                            currentPlayer = (currentPlayer + 1) % 2;// Switch to next player
+                            continue;
+                        }
+                    }
+
+                    System.out.println("Wheel spun: " + spinResult);
+                    System.out.println("Letters guessed so far: " + guessedLetters);
+                    System.out.println("Guess a consonant:");
+
+                    String consonantInput = in.nextLine();
+                    if (consonantInput.length() != 1 || !Character.isLetter(consonantInput.charAt(0))) {
+                        System.out.println("❌ Please enter a single letter.");
+                        break;
+                    }
+
+                    char guessedChar = Character.toLowerCase(consonantInput.charAt(0));
+                    if ("aeiou".indexOf(guessedChar) != -1) {
+                        System.out.println("That's a vowel — use option 2 to buy one.");
+                        break;
+                    }
+
+                    if (guessedLetters.contains(guessedChar)) {
+                        System.out.println("❌ You already guessed that letter!");
+                        break;
+                    }
+
+                    guessedLetters.add(guessedChar);
+                    boolean found = false;
+                    // Reveal correctly guessed consonants in the phrase
+                    for (int i = 0; i < test.length(); i++) {
+                        if (Character.toLowerCase(test.charAt(i)) == guessedChar) {
+                            guessedChars[i] = true;
+                            found = true;
+                        }
+                    }
+
+                    if (found) {
+                        playerScores.put(currentPlayerName, playerScores.get(currentPlayerName) + spinAmount);
+                        System.out.println("✅ Correct! You earned $" + spinAmount);
+                    } else {
+                        System.out.println("❌ Incorrect guess.");
+                    }
+
+                    break;
+
+
+                case "2":
+                     // Player chose to buy a vowel
+                    System.out.println("Enter a vowel to buy (a, e, i, o, u):");
+                    String vowelInput = in.nextLine();
+                    if (vowelInput.length() != 1 || !"aeiou".contains(vowelInput.toLowerCase())) {
+                        System.out.println("❌ Invalid vowel.");
+                        break;
+                    }
+
+                    char vowelChar = vowelInput.toLowerCase().charAt(0);
+                    if (guessedLetters.contains(vowelChar)) {
+                        System.out.println("❌ You already guessed that letter!");
+                        break;
+                    }
+
+                    if (playerScores.get(currentPlayerName) < 250) {
+                        System.out.println("Not enough money to buy a vowel.");
+                        break;
+                    }
+
+                    guessedLetters.add(vowelChar);
+                    playerScores.put(currentPlayerName, playerScores.get(currentPlayerName) - 250);
+                    boolean foundVowel = false;
+                    // Reveal correctly guessed vowels in the phrase
+                    for (int i = 0; i < test.length(); i++) {
+                        if (Character.toLowerCase(test.charAt(i)) == vowelChar) {
+                            guessedChars[i] = true;
+                            foundVowel = true;
+                        }
+                    }
+
+                    if (foundVowel) {
+                        System.out.println("✅ Correct vowel!");
+                    } else {
+                        System.out.println("❌ No match.");
+                    }
+                    break;
+
+                case "3":
+                    // Player chose to solve the puzzle
+                    System.out.println("Enter your solution (you get up to 3 tries):");
+                    boolean solved = false;
+
+                    for (int i = 0; i < 3; i++) {
+                        String attempt = in.nextLine();
+
+                        // Check if the player's guess matches the correct phrase
+                        if (attempt.toLowerCase().equals(test.toLowerCase())) {
+                            System.out.println("🎉 Correct! You solved it!");
+                            int currentScore = playerScores.getOrDefault(currentPlayerName, 0);
+                            playerScores.put(currentPlayerName, currentScore + 1000);// Reward for solving
+                            solved = true;
+                            guess = false; // Signal the end of the current guessing round
+                            break;
+                        } else {
+                            if (i < 2) {
+                                System.out.println("❌ Wrong! You have " + (2 - i) + " guesses left.");
+                            } else {
+                                System.out.println("❌ Failed to solve. Turn passes.");
+                            }
+                        }
+                    }
+                    // If the player failed all attempts, switch to next player
+                    if (!solved && guess) {
+                        currentPlayer = (currentPlayer + 1) % 2;
+                    }
+
+                    break;
+
+                case "4":
+                    // Player gives up; end the game immediately
+                    System.out.println(currentPlayerName + " gave up. Game over.");
+                    System.out.println("The correct phrase was: \"" + test + "\"");
+                    closeGame();
+                    guess = false;
+                    System.out.println("\n🏆 Final Scores:");
+                    System.out.println(playerOneName + ": $" + playerScores.get(playerOneName));
+                    System.out.println(playerTwoName + ": $" + playerScores.get(playerTwoName));
+                    break;
+
+
+                case "5":
+                    // Player chooses to save the game
+                    System.out.println("Saving with category: " + category);
+                    saveGame(playerOneName, playerTwoName, playerScores, test, hiddenTest, guessedLetters, currentPlayer, category);
+                    System.out.println("Game saved!");
+                    break;
+
+                case "6":
+                    // Player chooses to load a previously saved game
+                    Object[] loadedData = loadGame();
+                    if (loadedData != null) {
+                        playerOneName = (String) loadedData[0];
+                        playerTwoName = (String) loadedData[1];
+                        playerScores = (Map<String, Integer>) loadedData[2];
+                        test = (String) loadedData[3];  // saved phrase
+                        hiddenTest = (String) loadedData[4]; //masked version
+                        guessedLetters = (Set<Character>) loadedData[5];
+                        currentPlayer = (Integer) loadedData[6];
+                        category = (String) loadedData[7];
+                        System.out.println("Game loaded successfully!");
+                        System.out.println("Category: " + category);
+                        System.out.println("Current phrase: " + hiddenTest);
+                        System.out.println("Letters guessed: " + guessedLetters);
+                        System.out.println(players[currentPlayer] + "'s turn.");
+
+
+                    } else {
+                        System.out.println("Failed to load game.");
+                    }
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+                    break;
+
+
+
+
+
+            }
+
+            // Update phrase based on current guesses
+            StringBuilder currentGuess = new StringBuilder();
+            for (int i = 0; i < test.length(); i++) {
+                if (guessedChars[i]) {
+                    currentGuess.append(test.charAt(i));
+                } else {
+                    currentGuess.append('_');
+                }
+            }
+
+            hiddenTest = currentGuess.toString();
+            System.out.println(hiddenTest);
+
+            //Offer opportunity to solve the puzzle manually
+            System.out.println("Do you want to solve the phrase? (yes/no)");
+            String solve = in.nextLine();
+
+            if (solve.toLowerCase().equals("yes")) {
+                System.out.println("Enter your solution:");
+                boolean solved = false;
+
+                for (int i = 0; i < 3; i++) {
+                    String attempt = in.nextLine();
+                    if (attempt.toLowerCase().equals(test.toLowerCase())) {
+                        System.out.println("🎉 Correct! You solved it!");
+                        int currentScore = playerScores.getOrDefault(currentPlayerName, 0);
+                        playerScores.put(currentPlayerName, currentScore + currentTurnPoints + 1000);
+                        solved = true;
+                        guess = false;
+                        break;
+                    } else {
+                        if (i < 2) {
+                            System.out.println("❌ Wrong! You have " + (2 - i) + " guesses left.");
+                        } else {
+                            System.out.println("❌ Failed to solve. Turn passes.");
+                        }
+                    }
+                }
+
+                if (!solved && guess) {
+                    currentPlayer = (currentPlayer + 1) % 2; // Switch player after failed solve
+                }
+            } else {
+                // Switch turn if player chooses not to solve
+                currentPlayer = (currentPlayer + 1) % 2;
+            }
+            // Check if a player has run out of money and if game should end
+            if (playerScores.get(currentPlayerName) <= 0) {
+                System.out.println(currentPlayerName + " has run out of money! Game over.");
+                closeGame();
+                break;
+            }
+
+            // Check if both players have used 10 turns
+            if (turnCount.get(playerOneName) >= 10 && turnCount.get(playerTwoName) >= 10) {
+                System.out.println("Both players reached 10 turns. Game over!");
+                closeGame();
+                break;
+            }
+
+        }
+
+        // Show final scores
+        System.out.println("\n🏆 Final Scores:");
+        System.out.println(playerOneName + ": $" + playerScores.get(playerOneName));
+        System.out.println(playerTwoName + ": $" + playerScores.get(playerTwoName));
+    }
+
+    public static void main(String[] args) {
+        catsAndPhrases();
+    }
+}
